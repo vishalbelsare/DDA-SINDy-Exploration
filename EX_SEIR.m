@@ -38,6 +38,7 @@ for ii =2:N
     E(ii) = E(ii-1) + B_SE*S(ii-1)*I(ii-1)/Ntot - B_EI*E(ii-1);
     I(ii) = I(ii-1) + B_EI*E(ii-1) - B_IR*I(ii-1);
     % adding in the R data causes SINDy to fail.
+    
 end
 
 % create x and dx matrices with all variables:
