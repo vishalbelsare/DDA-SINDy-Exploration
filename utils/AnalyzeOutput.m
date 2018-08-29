@@ -48,7 +48,7 @@ end
 %}
 
     %%
-    figure(2)
+%    figure(2)
 %     plot(numcoeff, cell2mat({IC.aic_c}), 'o')
 %     xlabel('number of terms')
 %     ylabel('AICc')
@@ -65,6 +65,7 @@ end
 %     patch([0 max(numcoeff)+1 max(numcoeff)+1 0], [4 4 7 7], [0.2 0.2 0.2], 'FaceAlpha', 0.3)
 %     patch([0 max(numcoeff)+1 max(numcoeff)+1 0], [0 0 2 2], [0.2 0.2 0.2], 'FaceAlpha', 0.1)
     plot(numcoeff(minind),AIC_rel(minind),'om') % Highlight best model
+    title(plotTitle)
     
  
     
