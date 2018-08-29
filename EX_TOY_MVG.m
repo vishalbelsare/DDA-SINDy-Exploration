@@ -15,66 +15,70 @@ plottag = 2; % for plotting measurements and cross validation plottag = 1
 
 eps=  0.00025; % noise
 numvalidation = 100; % number of crossvalidation experiments
-tic
+
 %% generate Data
-n = 3; % Number of equations
+n = 3; % number of parameters
 
 % all others are zero
-% Transfer parameters
+% Transfer Parameters
 B_SE = 0.3; % Infectious rate
 B_EI = 0.4; % Incubation rate
-B_IR = 0.04; % Recovery rate
-% Vital parameters
-B_S = 0.02; % Birth rate
-B_SEIR = 0.02; % Death rate
-Ntot = 1e4; % Total (initial) population
-
-N  = 250; % number of time steps
+B_IR = 0.04;
+% vital parameters
+B_S = 0.02;
+B_SEIR = 0.01;
+Ntot = 1e4; % total (initial) population
 
 % Initial Conditions
 S(1) = 0.99*Ntot; % number of suceptibles in population
 E(1) = 0.01*Ntot;
 I(1) = 0;
-%R(1) = 0;
 
-plotTitle = 'SEIRvital';
+N  = 250; % number of time steps
 % disease tranfer model
+
+plotTitle = 'Toy Model';
 for ii =2:N
+    
+    % Toy Model: Test rank
+    S(ii) = S(ii-1) - 0.5*S(ii-1);
+    E(ii) = E(ii-1) + 0.5*S(ii-1) - 0.25*E(ii-1);
+    I(ii) = I(ii-1) + 0.25*E(ii-1) - 0.6*E(ii-1);
     %{
+    % Toy Model: Brine tank cascade
+    S(ii) = S(ii-1) - 0.5*S(ii-1);
+    E(ii) = E(ii-1) + 0.5*S(ii-1) - 0.25*E(ii-1);
+    I(ii) = I(ii-1) + 0.25*E(ii-1) - 0.6*I(ii-1);
+
     % SEIR model, static pop.
     S(ii) = S(ii-1) - B_SE*S(ii-1)*I(ii-1)/Ntot;
     E(ii) = E(ii-1) + B_SE*S(ii-1)*I(ii-1)/Ntot - B_EI*E(ii-1);
     I(ii) = I(ii-1) + B_EI*E(ii-1) - B_IR*I(ii-1);
     % adding in the R data causes SINDy to fail.
-    %}
+    
     % SEIR model, vital dynamics
-    S(ii) = S(ii-1) + B_S*Ntot - B_SEIR*S(ii-1) - B_SE*S(ii-1)*I(ii-1)/Ntot;
-    E(ii) = E(ii-1) + B_SE*S(ii-1)*I(ii-1)/Ntot - B_EI*E(ii-1) - B_SEIR*E(ii-1);
-    I(ii) = I(ii-1) + B_EI*E(ii-1) - B_IR*I(ii-1) - B_SEIR*I(ii-1);
-%    R(ii) = R(ii-1) + B_IR*I(ii-1) - B_SEIR*R(ii-1);
+    Ntot = S(ii-1) + E(ii-1) + I(ii-1) + R(ii-1); % Update pop.
+    S(ii) = S(ii-1) - B_SE*S(ii-1)*I(ii-1)/Ntot;
+    E(ii) = E(ii-1) + B_SE*S(ii-1)*I(ii-1)/Ntot - B_EI*E(ii-1);
+    I(ii) = I(ii-1) + B_EI*E(ii-1) - B_IR*I(ii-1);
+    %}
     
 end
 
 % create x and dx matrices with all variables:
 x = [S(1:end-1)' E(1:end-1)' I(1:end-1)'];
 dx = [S(2:end)' E(2:end)' I(2:end)'];
-% x = [S(1:end-1)' E(1:end-1)' I(1:end-1)' R(1:end-1)'];
-% dx = [S(2:end)' E(2:end)' I(2:end)' R(2:end)'];
-
 % add noise to state variables
 rng(10);
 x = x+eps*randn(size(x));
 
-% Plot specified data
 if plottag>=1
     figure(6)
     plot(x/Ntot, 'o')
     xlabel('time step')
     ylabel(['% of population size: ' num2str(Ntot)])
     legend('S', 'E', 'I')
-%    legend('S', 'E', 'I', 'R')
     legend('boxoff')
-    title(plotTitle)
 end
 
 %% pool Data
@@ -116,29 +120,25 @@ end
 
 for jj = 1:numvalidation
     % initialize
-    S = zeros(N,1); % Susceptible
+    S = zeros(N,1); % susceptibles
     E = zeros(N,1); % Latent/exposed
-    I = zeros(N,1); % Infected
-%    R = zeros(N,1); % Recovered
+    I = zeros(N,1); % infected
     
     % Initial Conditions
     S(1) = x0cross(1, jj); % number of suceptibles in population
     E(1) = x0cross(2, jj);
     I(1) = x0cross(3, jj);
-%    R(1) = x0cross(4, jj);
     
     for ii =2:N
-    S(ii) = S(ii-1) + B_S*Ntot - B_SEIR*S(ii-1) - B_SE*S(ii-1)*I(ii-1)/Ntot;
-    E(ii) = E(ii-1) + B_SE*S(ii-1)*I(ii-1)/Ntot - B_EI*E(ii-1) - B_SEIR*E(ii-1);
-    I(ii) = I(ii-1) + B_EI*E(ii-1) - B_IR*I(ii-1) - B_SEIR*I(ii-1);
-%    R(ii) = R(ii-1) + B_IR*I(ii-1) - B_SEIR*R(ii-1);
+    S(ii) = S(ii-1) - 0.5*S(ii-1);
+    E(ii) = E(ii-1) + 0.5*S(ii-1) - 0.25*E(ii-1);
+    I(ii) = I(ii-1) + 0.25*E(ii-1) - 0.6*E(ii-1);
+
     end
     % create x and dx matrices with all variables:
     x2= [S(1:end-1) E(1:end-1) I(1:end-1)];
-%    x2= [S(1:end-1) E(1:end-1) I(1:end-1) R(1:end-1)];
     xA{jj} = x2 +eps*randn(size(x2));
     dxA{jj} = [S(2:end) E(2:end) I(2:end)]';
-%    dxA{jj} = [S(2:end) E(2:end) I(2:end) R(2:end)]';
     
 end
 val.x0 = x0cross;
@@ -167,5 +167,3 @@ AnalyzeOutput
 
 rmpath('utils')
 rmpath('models')
-
-toc
