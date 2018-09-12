@@ -25,20 +25,22 @@ B_SE = 0.3;
 B_EI = 0.4;
 B_IR = 0.04;
 Ntot = 1e4; % total population
+N  = 250; % number of time steps
+
+p = cumsum(randn(1,N));
 
 % Initial Conditions
 S(1) = 0.99*Ntot; % number of suceptibles in population
 E(1) = 0.01*Ntot;
 I(1) = 0;
-P(1) = 0;
+P(1) = p(1);
 
-N  = 250; % number of time steps
 % disease tranfer model
 for ii =2:N
     S(ii) = S(ii-1) - B_SE*S(ii-1)*I(ii-1)/Ntot;
     E(ii) = E(ii-1) + B_SE*S(ii-1)*I(ii-1)/Ntot - B_EI*E(ii-1);
     I(ii) = I(ii-1) + B_EI*E(ii-1) - B_IR*I(ii-1);
-    P(ii) = P(ii-1) + 1;
+    P(ii) = p(ii);
     
 end
 
@@ -54,7 +56,7 @@ if plottag>=1
     plot(x/Ntot, 'o')
     xlabel('time step')
     ylabel(['% of population size: ' num2str(Ntot)])
-    legend('S', 'E', 'I')
+    legend('S', 'E', 'I', 'P')
     legend('boxoff')
 end
 
@@ -93,7 +95,7 @@ end
 %% calculate validation data for new intial conditions.
 
  x0cross = 10.^(-1 + (4+1)*rand(n,numvalidation));
-
+ p = cumsum(randn(N,numvalidation),2);
 
 for jj = 1:numvalidation
     % initialize
@@ -106,13 +108,13 @@ for jj = 1:numvalidation
     S(1) = x0cross(1, jj); % number of suceptibles in population
     E(1) = x0cross(2, jj);
     I(1) = x0cross(3, jj);
-    P(1) = 0;
+    P(1) = p(1,jj);
     
     for ii =2:N
         S(ii) = S(ii-1) - B_SE*S(ii-1)*I(ii-1)/Ntot;
         E(ii) = E(ii-1) + B_SE*S(ii-1)*I(ii-1)/Ntot - B_EI*E(ii-1);
         I(ii) = I(ii-1) + B_EI*E(ii-1) - B_IR*I(ii-1);
-        P(ii) = P(ii-1) + 1;
+        P(ii) = p(ii,jj);
     end
     % create x and dx matrices with all variables:
     x2= [S(1:end-1) E(1:end-1) I(1:end-1) P(1:end-1)];
