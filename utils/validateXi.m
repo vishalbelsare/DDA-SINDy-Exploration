@@ -35,6 +35,7 @@ for kk = 1:ninits % for each initial condition
         for jj = 2:tvec
             dx = sparseGalerkin(0,xtemp(:,jj-1),Xi,polyorder,usesine);
             if ~any(isnan(dx))
+               % xtemp(:,jj) = dx(1:n,1); % For pt1, pt2, ... included: dx is 3+pt# by 1
                 xtemp(:,jj) = dx;
             else % if the simulation has become unstable and blown up just
                 % use last stored value

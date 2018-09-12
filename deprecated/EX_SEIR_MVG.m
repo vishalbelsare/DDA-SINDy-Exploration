@@ -21,10 +21,13 @@ n = 3; % number of parameters
 
 % all others are zero
 % Transfer Parameters
-B_SE = 0.3;
-B_EI = 0.4;
+B_SE = 0.3; % Infectious rate
+B_EI = 0.4; % Incubation rate
 B_IR = 0.04;
-Ntot = 1e4; % total population
+% vital parameters
+B_S = 0.02;
+B_SEIR = 0.01;
+Ntot = 1e4; % total (initial) population
 
 % Initial Conditions
 S(1) = 0.99*Ntot; % number of suceptibles in population
@@ -33,11 +36,21 @@ I(1) = 0;
 
 N  = 250; % number of time steps
 % disease tranfer model
+
+
 for ii =2:N
+    
+    % SEIR model, static pop.
     S(ii) = S(ii-1) - B_SE*S(ii-1)*I(ii-1)/Ntot;
     E(ii) = E(ii-1) + B_SE*S(ii-1)*I(ii-1)/Ntot - B_EI*E(ii-1);
     I(ii) = I(ii-1) + B_EI*E(ii-1) - B_IR*I(ii-1);
     % adding in the R data causes SINDy to fail.
+    
+    % SEIR model, vital dynamics
+    Ntot = S(ii-1) + E(ii-1) + I(ii-1) + R(ii-1); % Update pop.
+    S(ii) = S(ii-1) - B_SE*S(ii-1)*I(ii-1)/Ntot;
+    E(ii) = E(ii-1) + B_SE*S(ii-1)*I(ii-1)/Ntot - B_EI*E(ii-1);
+    I(ii) = I(ii-1) + B_EI*E(ii-1) - B_IR*I(ii-1);
     
 end
 
@@ -106,9 +119,9 @@ for jj = 1:numvalidation
     I(1) = x0cross(3, jj);
     
     for ii =2:N
-        S(ii) = S(ii-1) - B_SE*S(ii-1)*I(ii-1)/Ntot;
-        E(ii) = E(ii-1) + B_SE*S(ii-1)*I(ii-1)/Ntot - B_EI*E(ii-1);
-        I(ii) = I(ii-1) + B_EI*E(ii-1) - B_IR*I(ii-1);
+    S(ii) = S(ii-1) - B_SE*S(ii-1)*I(ii-1)/Ntot;
+    E(ii) = E(ii-1) + B_SE*S(ii-1)*I(ii-1)/Ntot - B_EI*E(ii-1);
+    I(ii) = I(ii-1) + B_EI*E(ii-1) - B_IR*I(ii-1);
     end
     % create x and dx matrices with all variables:
     x2= [S(1:end-1) E(1:end-1) I(1:end-1)];
@@ -138,7 +151,6 @@ end
 
 AIC_rel =cell2mat({IC.aic})-min(cell2mat({IC.aic}));
 % plot number of terms vs AIC plot
-plotTitle = strcat('numlambda = ',num2str(lambdavals.numlambda));
 AnalyzeOutput
 
 rmpath('utils')

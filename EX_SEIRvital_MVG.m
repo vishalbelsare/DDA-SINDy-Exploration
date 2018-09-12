@@ -7,7 +7,8 @@
 addpath('utils')
 addpath('models')
 changeplot
-clear all, close all, clc
+%clear all, close all, clc
+clear all, clc
 
 filename = 'SEIR';
 plottag = 2; % for plotting measurements and cross validation plottag = 1
@@ -32,26 +33,26 @@ Ntot = 1e4; % Total (initial) population
 N  = 250; % number of time steps
 
 % Initial Conditions
-S(1) = 0.99*Ntot; % number of suceptibles in population
-E(1) = 0.01*Ntot;
-I(1) = 0;
+S(1) = 0.99*Ntot; % Susceptible
+E(1) = 0.01*Ntot; % Exposed
+I(1) = 0;         % Infected
 %R(1) = 0;
 
 plotTitle = 'SEIRvital';
 % disease tranfer model
 for ii =2:N
-    %{
+    
     % SEIR model, static pop.
     S(ii) = S(ii-1) - B_SE*S(ii-1)*I(ii-1)/Ntot;
     E(ii) = E(ii-1) + B_SE*S(ii-1)*I(ii-1)/Ntot - B_EI*E(ii-1);
     I(ii) = I(ii-1) + B_EI*E(ii-1) - B_IR*I(ii-1);
     % adding in the R data causes SINDy to fail.
-    %}
-    % SEIR model, vital dynamics
-    S(ii) = S(ii-1) + B_S*Ntot - B_SEIR*S(ii-1) - B_SE*S(ii-1)*I(ii-1)/Ntot;
-    E(ii) = E(ii-1) + B_SE*S(ii-1)*I(ii-1)/Ntot - B_EI*E(ii-1) - B_SEIR*E(ii-1);
-    I(ii) = I(ii-1) + B_EI*E(ii-1) - B_IR*I(ii-1) - B_SEIR*I(ii-1);
-%    R(ii) = R(ii-1) + B_IR*I(ii-1) - B_SEIR*R(ii-1);
+    
+%     % SEIR model, vital dynamics
+%     S(ii) = S(ii-1) + B_S*Ntot - B_SEIR*S(ii-1) - B_SE*S(ii-1)*I(ii-1)/Ntot;
+%     E(ii) = E(ii-1) + B_SE*S(ii-1)*I(ii-1)/Ntot - B_EI*E(ii-1) - B_SEIR*E(ii-1);
+%     I(ii) = I(ii-1) + B_EI*E(ii-1) - B_IR*I(ii-1) - B_SEIR*I(ii-1);
+% %    R(ii) = R(ii-1) + B_IR*I(ii-1) - B_SEIR*R(ii-1);
     
 end
 
