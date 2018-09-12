@@ -17,7 +17,7 @@ eps=  0.00025; % noise
 numvalidation = 100; % number of crossvalidation experiments
 
 %% generate Data
-n = 3; % number of parameters
+n = 4; % number of equations
 
 % all others are zero
 % Transfer Parameters
@@ -30,6 +30,7 @@ Ntot = 1e4; % total population
 S(1) = 0.99*Ntot; % number of suceptibles in population
 E(1) = 0.01*Ntot;
 I(1) = 0;
+P(1) = 0;
 
 N  = 250; % number of time steps
 % disease tranfer model
@@ -37,13 +38,13 @@ for ii =2:N
     S(ii) = S(ii-1) - B_SE*S(ii-1)*I(ii-1)/Ntot;
     E(ii) = E(ii-1) + B_SE*S(ii-1)*I(ii-1)/Ntot - B_EI*E(ii-1);
     I(ii) = I(ii-1) + B_EI*E(ii-1) - B_IR*I(ii-1);
-    % adding in the R data causes SINDy to fail.
+    P(ii) = P(ii-1) + 1;
     
 end
 
 % create x and dx matrices with all variables:
-x = [S(1:end-1)' E(1:end-1)' I(1:end-1)'];
-dx = [S(2:end)' E(2:end)' I(2:end)'];
+x = [S(1:end-1)' E(1:end-1)' I(1:end-1)' P(1:end-1)'];
+dx = [S(2:end)' E(2:end)' I(2:end)' P(2:end)'];
 % add noise to state variables
 rng(10);
 x = x+eps*randn(size(x));
@@ -99,21 +100,24 @@ for jj = 1:numvalidation
     S = zeros(N,1); % susceptibles
     E = zeros(N,1); % Latent/exposed
     I = zeros(N,1); % infected
+    P = zeros(N,1);
     
     % Initial Conditions
     S(1) = x0cross(1, jj); % number of suceptibles in population
     E(1) = x0cross(2, jj);
     I(1) = x0cross(3, jj);
+    P(1) = 0;
     
     for ii =2:N
         S(ii) = S(ii-1) - B_SE*S(ii-1)*I(ii-1)/Ntot;
         E(ii) = E(ii-1) + B_SE*S(ii-1)*I(ii-1)/Ntot - B_EI*E(ii-1);
         I(ii) = I(ii-1) + B_EI*E(ii-1) - B_IR*I(ii-1);
+        P(ii) = P(ii-1) + 1;
     end
     % create x and dx matrices with all variables:
-    x2= [S(1:end-1) E(1:end-1) I(1:end-1)];
+    x2= [S(1:end-1) E(1:end-1) I(1:end-1) P(1:end-1)];
     xA{jj} = x2 +eps*randn(size(x2));
-    dxA{jj} = [S(2:end) E(2:end) I(2:end)]';
+    dxA{jj} = [S(2:end) E(2:end) I(2:end) P(2:end)]';
     
 end
 val.x0 = x0cross;
