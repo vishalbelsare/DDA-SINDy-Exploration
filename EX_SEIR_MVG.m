@@ -21,13 +21,18 @@ n = 4; % number of equations
 
 % all others are zero
 % Transfer Parameters
-B_SE = 0.3;
+B_SE = 0.4;
 B_EI = 0.4;
 B_IR = 0.04;
 Ntot = 1e4; % total population
 N  = 250; % number of time steps
 
+rng(6) % Set seed for consistent results
 p = cumsum(randn(1,N));
+range = max(p) - min(p);
+pCenter = p - max(p) + 0.5*range;
+pStand = 0.1 .* (pCenter./max(pCenter)); % standardized to +/- 0.1
+p = pStand;
 
 % Initial Conditions
 S(1) = 0.99*Ntot; % number of suceptibles in population
@@ -35,13 +40,13 @@ E(1) = 0.01*Ntot;
 I(1) = 0;
 P(1) = p(1);
 
-% disease tranfer model
+% disease transfer model
 for ii =2:N
-    S(ii) = S(ii-1) - B_SE*S(ii-1)*I(ii-1)/Ntot;
-    E(ii) = E(ii-1) + B_SE*S(ii-1)*I(ii-1)/Ntot - B_EI*E(ii-1);
+    S(ii) = S(ii-1) - (P(ii-1)+B_SE)*S(ii-1)*I(ii-1)/Ntot;
+    E(ii) = E(ii-1) + (P(ii-1)+B_SE)*S(ii-1)*I(ii-1)/Ntot - B_EI*E(ii-1);
     I(ii) = I(ii-1) + B_EI*E(ii-1) - B_IR*I(ii-1);
     P(ii) = p(ii);
-    
+    % Don't forget to update the cross-validation!
 end
 
 % create x and dx matrices with all variables:
@@ -96,6 +101,10 @@ end
 
  x0cross = 10.^(-1 + (4+1)*rand(n,numvalidation));
  p = cumsum(randn(N,numvalidation),2);
+ range = max(p) - min(p);
+ pCenter = p - max(p) + 0.5*range;
+ pStand = 0.1 .* (pCenter./max(pCenter)); % standardized to +/- 0.1
+ p = pStand;
 
 for jj = 1:numvalidation
     % initialize
@@ -111,10 +120,10 @@ for jj = 1:numvalidation
     P(1) = p(1,jj);
     
     for ii =2:N
-        S(ii) = S(ii-1) - B_SE*S(ii-1)*I(ii-1)/Ntot;
-        E(ii) = E(ii-1) + B_SE*S(ii-1)*I(ii-1)/Ntot - B_EI*E(ii-1);
-        I(ii) = I(ii-1) + B_EI*E(ii-1) - B_IR*I(ii-1);
-        P(ii) = p(ii,jj);
+    S(ii) = S(ii-1) - (P(ii-1)+B_SE)*S(ii-1)*I(ii-1)/Ntot;
+    E(ii) = E(ii-1) + (P(ii-1)+B_SE)*S(ii-1)*I(ii-1)/Ntot - B_EI*E(ii-1);
+    I(ii) = I(ii-1) + B_EI*E(ii-1) - B_IR*I(ii-1);
+    P(ii) = p(ii);
     end
     % create x and dx matrices with all variables:
     x2= [S(1:end-1) E(1:end-1) I(1:end-1) P(1:end-1)];
