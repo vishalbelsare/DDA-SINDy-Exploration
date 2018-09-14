@@ -1,8 +1,12 @@
 %% Analyze results
-minind = find(min(cell2mat({IC.aic_c})) == cell2mat({IC.aic_c}), 1, 'first');
+minind = find(min(cell2mat({IC.aic_c})) == cell2mat({IC.aic_c}), 1, 'first')
+mincoeff = numcoeff(minind)
 x1coeff = Xicomb{minind}
-mincoeff = numcoeff(minind);
 
+% TESTING
+minind2 = find(min(AIC_rel) == AIC_rel, 1, 'first')
+mincoeff2 = numcoeff(minind2)
+x1coeff2 = Xicomb{minind2}
 
 % find models with index below or equal to relAICc = 7;
 indless7 = find(AIC_rel<=7);
@@ -47,18 +51,31 @@ end
     end
 %}
 
-    %%
-%    figure(2)
-%     plot(numcoeff, cell2mat({IC.aic_c}), 'o')
-%     xlabel('number of terms')
-%     ylabel('AICc')
+%%
+% Note: 
+% minind == best model picked by aic_c metric above.
     
-    figure(3); hold on
+% Plot relative AICc
+AICcRel =cell2mat({IC.aic_c})-min(cell2mat({IC.aic_c}));
+   figure; hold on
+    plot(numcoeff, AICcRel, 'o')
+    plot(numcoeff(minind),AICcRel(minind),'om') % Plot best model by AIC_c
+    xlabel('number of terms')
+    ylabel('Relative AICc')
+    title(['\lambda =',...
+                    num2str(lambdavals.lambdastart),':',...
+                    num2str(lambdavals.numlambda),':',...
+                    num2str(lambdavals.lambdaend)])
+
+%{
+% Plot relative AIC
+% AIC_Rel defined in EX_SEIR.m
+    figure; hold on
     plot(numcoeff, AIC_rel, 'o')
      axis([min(numcoeff) max(numcoeff) 0 max(AIC_rel)])
 %    axis([min(numcoeff) 20 0 max(AIC_rel)])
     xlabel('number of terms')    
-    ylabel('relative AICc')
+    ylabel('Relative AIC')
 %     patch([0 max(numcoeff)+1 max(numcoeff)+1 0], ...
 %         [10 10  max(AIC_rel) max(AIC_rel)], ...
 %         [0.2 0.2 0.2], 'FaceAlpha', 0.6)
@@ -67,8 +84,14 @@ end
     plot(numcoeff(minind),AIC_rel(minind),'om') % Highlight best model
     title(plotTitle)
     
- 
-    
+% Plot relative BIC
+BIC_Rel =cell2mat({IC.bic})-min(cell2mat({IC.bic}));
+   figure; hold on
+    plot(numcoeff, BIC_Rel, 'o')
+    plot(numcoeff(minind),BIC_Rel(minind),'om') % Plot best model by AIC_c
+    xlabel('number of terms')
+    ylabel('Relative BIC')
+%}
   
 %% integrate identified systems
 % this takes too long. may or may not require more debugging.
