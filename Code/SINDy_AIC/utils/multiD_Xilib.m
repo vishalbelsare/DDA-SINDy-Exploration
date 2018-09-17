@@ -1,4 +1,4 @@
-function [Xicomb, numcoeff, Lambda] = multiD_Xilib(Thetalib, lambdavals)
+function [Xicomb, numcoeff, lambdavec] = multiD_Xilib(Thetalib, lambdavals)
 % Run a multidimensional pareto front w/ cross validation.
 % Thetalib is a structure containing variables for data matrix
 % crossval is a structure data containing the validation experiments
@@ -79,6 +79,7 @@ for ll = 1:length(lambda_index) % for each sparse thershold, or model
     % add this model to the saved structure
     Xicomb{nn} = Xibuild;
     % number of coefficients in each
+    lambdavec(nn,:) = lambdanum_state;
     numcoeff(nn) = numberofcoefficients;
     nn = nn+1;
 
