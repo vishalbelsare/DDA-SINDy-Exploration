@@ -40,7 +40,7 @@ Ntot = 1e4;
 S(1) = 0.99*Ntot; % Susceptible
 E(1) = 0.01*Ntot; % Exposed
 I(1) = 0;         % Infected
-%R(1) = 0;
+P(1) = 0;
 
 %%
 % Random walk precipitation

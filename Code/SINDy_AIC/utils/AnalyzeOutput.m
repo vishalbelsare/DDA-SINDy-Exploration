@@ -1,12 +1,13 @@
 %% Analyze results
 minind = find(min(cell2mat({IC.aic_c})) == cell2mat({IC.aic_c}), 1, 'first')
-mincoeff = numcoeff(minind)
+mincoeff = numcoeff(minind);
 x1coeff = Xicomb{minind}
+lambdavec(minind,:)
 
-% TESTING
-minind2 = find(min(AIC_rel) == AIC_rel, 1, 'first')
-mincoeff2 = numcoeff(minind2)
-x1coeff2 = Xicomb{minind2}
+% % TESTING
+% minind2 = find(min(AIC_rel) == AIC_rel, 1, 'first')
+% mincoeff2 = numcoeff(minind2)
+% x1coeff2 = Xicomb{minind2}
 
 % find models with index below or equal to relAICc = 7;
 indless7 = find(AIC_rel<=7);

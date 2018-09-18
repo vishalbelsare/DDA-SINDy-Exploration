@@ -1,4 +1,4 @@
-function dy = sparseGalerkin(t,y,ahat,polyorder,usesine)
+function dy = sparseGalerkin(t,y,ahat,polyorder,usesine,nstates)
 % Copyright 2015, All Rights Reserved
 % Code by Steven L. Brunton
 % For Paper, "Discovering Governing Equations from Data: 

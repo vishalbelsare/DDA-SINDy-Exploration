@@ -1,4 +1,4 @@
-function [Xicomb, numcoeff, lambdavec] = multiD_Xilib(Thetalib, lambdavals)
+function [Xicomb, numcoeff, lambdavec] = multiD_Xilib(Thetalib, lambdavals, nstates)
 % Run a multidimensional pareto front w/ cross validation.
 % Thetalib is a structure containing variables for data matrix
 % crossval is a structure data containing the validation experiments
@@ -19,7 +19,7 @@ lambdaend = lambdavals.lambdaend;
 Lambda = logspace(lambdastart,lambdaend, numlambda);
 
 % get sizes and lengths of data, library, and states
-[ntimeseries, nstates] = size(dx);
+%[ntimeseries, nstates] = size(dx);
 [ntimeseries, nfunc] = size(Theta);
 
 
