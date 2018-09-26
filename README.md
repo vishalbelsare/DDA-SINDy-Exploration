@@ -6,5 +6,5 @@
 * __2018-09_SINDyNotesQuestions.docx__ is a consolidation of my broader notes, thoughts, and questions.
 
 ## Best practice dev.
-* I have started moving to git commits as a way of tracking project progress over the lab book.
+* I have started moving to __git commits__ as a way of tracking project progress over the lab book.
 * Not sure yet what final organizational structure should look like. Feeling it out as I go!
