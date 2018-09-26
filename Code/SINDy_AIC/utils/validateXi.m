@@ -1,5 +1,5 @@
 function [abserror, RMSE, savetB, savexB] = ...
-    validateXi(Xi, Thetalib,validation, plottag,nstates)
+    validateXi(Xi, Thetalib,validation, plottag)
 % perform a cross validation given Xi
 % returns absolute error and root mean squared error for each test case
 % also returns generated test time series data in data structures
@@ -31,12 +31,12 @@ for kk = 1:ninits % for each initial condition
     if length(tvec) == 1 % if discrete:
         
         % set initial condition
-        xtemp(:,1) = [x0(:,kk); exo(1)] ;
+        xtemp(:,1) = [x0(:,kk); exo(1,:)'] ;
         
         % directly calculate each next time step
         for jj = 2:tvec
-            dx = sparseGalerkin(0,xtemp(:,jj-1),Xi,polyorder,usesine,nstates);
-            dx = [dx; Thetalib.dx(jj-1,4)];
+            dx = sparseGalerkin(xtemp(:,jj-1),Xi,polyorder,usesine);
+            dx = [dx; Thetalib.dx(jj-1,4:6)'];
             if ~any(isnan(dx))
                % xtemp(:,jj) = dx(1:n,1); % For pt1, pt2, ... included: dx is 3+pt# by 1
                 xtemp(:,jj) = dx;
@@ -48,7 +48,7 @@ for kk = 1:ninits % for each initial condition
         
         % save results in structure
         savetB{kk} = 1:tvec-1;
-        savexB{kk} = xtemp(:,1:end-1)';
+        savexB{kk} = xtemp(1:3,1:end-1)';
         
         % save error
         tlength = min([length(savexB{kk}) length(xA{kk})]);

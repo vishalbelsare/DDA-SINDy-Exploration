@@ -1,4 +1,4 @@
-function [Xicomb, numcoeff, lambdavec] = multiD_Xilib(Thetalib, lambdavals, nstates)
+function [Xicomb, numcoeff, lambdavec] = multiD_Xilib(Thetalib, lambdavals, nFunc)
 % Run a multidimensional pareto front w/ cross validation.
 % Thetalib is a structure containing variables for data matrix
 % crossval is a structure data containing the validation experiments
@@ -24,12 +24,12 @@ Lambda = logspace(lambdastart,lambdaend, numlambda);
 
 
 % declare stuff to be correct size
-XiLambda_L2 = zeros(nfunc,numlambda,nstates);
+XiLambda_L2 = zeros(nfunc,numlambda,nFunc);
 
 
 % Run sparse-regression independently on each state variable and do a Least-squares
 % regression on the output for each lambda.
-for ll = 1:nstates % for each state variable
+for ll = 1:nFunc % for each state variable
     for jj = 1:numlambda % and each threshold value
         XiLambda_L2(:,jj,ll) = sparsifyDynamics(Theta,dx(:,ll), Lambda(jj), 1);
     end
@@ -37,7 +37,7 @@ end
 
 % create a matrix of threshold values, so that all permutations of the
 % recovered equations for each state are explored.
-lambda_index = permn(1:numlambda,nstates);
+lambda_index = permn(1:numlambda,nFunc);
 
 % initialize the loop values
 Xiold= 0;
@@ -61,7 +61,7 @@ for ll = 1:length(lambda_index) % for each sparse thershold, or model
     end
     % put all coefficients into a vector to check if we have tried this Xi
     % before
-    Xitest = reshape(Xibuild, nstates*nfunc,1);
+    Xitest = reshape(Xibuild, nFunc*nfunc,1);
     
     [junk, nlib] = size(Xilib); % get the size of the library
     

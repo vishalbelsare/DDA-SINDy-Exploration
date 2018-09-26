@@ -1,4 +1,4 @@
-function yout = poolData(yin,nVars,polyorder,usesine)
+function yout = poolData(yin,polyorder,usesine)
 % Create feature library
 
 % Copyright 2015, All Rights Reserved
@@ -9,7 +9,8 @@ function yout = poolData(yin,nVars,polyorder,usesine)
 
 % Extra comments by mvg
 
-n = size(yin,1);
+n = size(yin,1); % timesteps
+nVars = size(yin,2); % number of variables
 % yout = zeros(n,1+nVars+(nVars*(nVars+1)/2)+(nVars*(nVars+1)*(nVars+2)/(2*3))+11);
 
 ind = 1;

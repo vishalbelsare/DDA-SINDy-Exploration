@@ -1,11 +1,12 @@
-function [yout] = poolData(yin,nVars,polyorder,usesine, laurentorder)
+function [yout] = poolData(yin,polyorder,usesine, laurentorder)
 % Copyright 2015, All Rights Reserved
 % Code by Steven L. Brunton
 % For Paper, "Discovering Governing Equations from Data:
 %        Sparse Identification of Nonlinear Dynamical Systems"
 % by S. L. Brunton, J. L. Proctor, and J. N. Kutz
 
-n = size(yin,1);
+n = size(yin,1); % timesteps
+nVars = size(yin,2); % number of variables
 % yout = zeros(n,1+nVars+(nVars*(nVars+1)/2)+(nVars*(nVars+1)*(nVars+2)/(2*3))+11);
 
 ind = 1;
