@@ -82,7 +82,7 @@ if(laurentorder>=1)
     for i=1:nVars
         yout(yin(:,i)>=thresh,ind) = 1./yin(yin(:,i)>=thresh, i);
         yout(yin(:,i)<thresh, ind) = 0;
-        ind = ind+1
+        ind = ind+1;
     end
 end
 

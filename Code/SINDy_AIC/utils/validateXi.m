@@ -7,6 +7,7 @@ function [abserror, RMSE, savetB, savexB] = ...
 
 polyorder = Thetalib.polyorder;
 usesine = Thetalib.usesine;
+nFunc = Thetalib.nFunc;
 
 x0 = validation.x0;
 tA = validation.tA;
@@ -36,10 +37,9 @@ for kk = 1:ninits % for each initial condition
         % directly calculate each next time step
         for jj = 2:tvec
             dx = sparseGalerkin(xtemp(:,jj-1),Xi,polyorder,usesine);
-            dx = [dx; Thetalib.dx(jj-1,4:6)'];
             if ~any(isnan(dx))
-               % xtemp(:,jj) = dx(1:n,1); % For pt1, pt2, ... included: dx is 3+pt# by 1
-                xtemp(:,jj) = dx;
+            %    xtemp(:,jj) = dx;
+                xtemp(:,jj) = [dx; exo(jj,:)'];            
             else % if the simulation has become unstable and blown up just
                 % use last stored value
                 xtemp(:,jj) = xtemp(:,jj-1);
@@ -48,7 +48,7 @@ for kk = 1:ninits % for each initial condition
         
         % save results in structure
         savetB{kk} = 1:tvec-1;
-        savexB{kk} = xtemp(1:3,1:end-1)';
+        savexB{kk} = xtemp(1:nFunc,1:end-1)';
         
         % save error
         tlength = min([length(savexB{kk}) length(xA{kk})]);

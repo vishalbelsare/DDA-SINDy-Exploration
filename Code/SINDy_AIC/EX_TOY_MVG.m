@@ -16,21 +16,29 @@ plottag = 2; % for plotting measurements and cross validation plottag = 1
 eps=  0.00025; % noise
 numvalidation = 100; % number of crossvalidation experiments
 
+format short e
+
 %% generate Data
 
 N  = 250; % number of time steps
-nLags = 2; % number of lags
+nLags = 0; % number of lags
+nExoVars = 2; % number of exogenous variables (without lags)
 % Specify how many variables to use
-nExo = 1 + nLags; % number of exogenous variables included in poolData
+nExo = nExoVars + nLags; % total number of exogenous variables included in poolData
 nFunc = 3; % number of equations to keep for model ID
 
 % Exogenous variable
 P = linspace(0,10,N+nLags)';
-% Lag variables
-P2 = P(1:(end-nLags));
-P1 = P(nLags:(end-(nLags-1)));
-P = P((nLags+1):end);
-exo = [P P1 P2];
+exo = P;
+% More than one exogenous variable
+Q = linspace(5,15,N+nLags)';
+exo = [exo Q];
+
+% % Lag variables
+% P2 = P(1:(end-nLags));
+% P1 = P(nLags:(end-(nLags-1)));
+% P = P((nLags+1):end);
+% exo = [P P1 P2];
 
 % Initial Conditions
 Ntot = 1e4; % Total population
@@ -41,12 +49,13 @@ I(1) = 0;
 plotTitle = 'Toy Model';
 for ii = 2:N
 % Make synthetic data
-    
+% DON'T FORGET TO CHANGE THE MODEL IN THE VALIDATION SECTION!!!    
     % Toy Model: Brine tank cascade
     S(ii) = S(ii-1) - 0.5*S(ii-1);
     E(ii) = E(ii-1) + 0.5*S(ii-1) - 0.25*E(ii-1);
-    I(ii) = I(ii-1) + 0.25*E(ii-1) - 0.7*I(ii-1) + ...
-                        0.5*P(ii-1) + 1.0*P1(ii-1) + 4.0*P2(ii-1);
+    I(ii) = I(ii-1) + 0.25*E(ii-1) - 0.7*I(ii-1)...
+            + 0.1*P(ii-1); % + 0.1*Q(ii-1);
+          % + 0.05*P1(ii-1) + 0.025*P2(ii-1);
 
 end
 
@@ -87,6 +96,7 @@ Thetalib.normTheta = 0;
 Thetalib.dx = dx;
 Thetalib.polyorder = polyorder;
 Thetalib.usesine = usesine;
+Thetalib.nFunc = nFunc;
 
 %% compute Sparse regression
 lambdavals.numlambda = 20;
@@ -120,8 +130,9 @@ for jj = 1:numvalidation
     for ii =2:N
     S(ii) = S(ii-1) - 0.5*S(ii-1);
     E(ii) = E(ii-1) + 0.5*S(ii-1) - 0.25*E(ii-1);
-    I(ii) = I(ii-1) + 0.25*E(ii-1) - 0.7*I(ii-1) + ...
-                        0.1*P(ii-1) + 0.05*P1(ii-1) + 0.025*P2(ii-1);
+    I(ii) = I(ii-1) + 0.25*E(ii-1) - 0.7*I(ii-1)...
+            + 0.1*P(ii-1); % + 0.1*Q(ii-1);
+          % + 0.05*P1(ii-1) + 0.025*P2(ii-1);
 
     end
     % create x and dx matrices with all function variables:

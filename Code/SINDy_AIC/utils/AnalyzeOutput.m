@@ -2,7 +2,7 @@
 minind = find(min(cell2mat({IC.aic_c})) == cell2mat({IC.aic_c}), 1, 'first')
 mincoeff = numcoeff(minind);
 x1coeff = Xicomb{minind}
-lambdavec(minind,:)
+lambdas = lambdavec(minind,:)
 
 % % TESTING
 % minind2 = find(min(AIC_rel) == AIC_rel, 1, 'first')
